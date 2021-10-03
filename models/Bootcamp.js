@@ -101,6 +101,11 @@ const BootcampSchema = mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      required: true,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -108,7 +113,7 @@ const BootcampSchema = mongoose.Schema(
   }
 );
 
-// create bootcamp slide from the name
+// create bootcamp slug from the name
 BootcampSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
@@ -136,7 +141,6 @@ BootcampSchema.pre('save', async function (next) {
 
 //Cascade delete courses whean a bootcamp is deleted
 BootcampSchema.pre('remove', async function (next) {
-  console.log(`courses being removed from bootcamp ${this._id}`);
   await this.model('Course').deleteMany({ bootcamp: this._id });
   next();
 });
